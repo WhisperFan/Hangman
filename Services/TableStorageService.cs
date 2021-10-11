@@ -56,11 +56,18 @@ namespace Hangman.Services
         }
         private async Task<CloudTable> GetCloudTable()
         {
-            var storageAccount = CloudStorageAccount.Parse(_configuration["StorageConnectionString"]);
-            var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
-            var table = tableClient.GetTableReference(TableName);
-            await table.CreateIfNotExistsAsync();
-            return table;
+            try
+            {
+                var storageAccount = CloudStorageAccount.Parse(_configuration["StorageConnectionString"]);
+                var tableClient = storageAccount.CreateCloudTableClient(new TableClientConfiguration());
+                var table = tableClient.GetTableReference(TableName);
+                await table.CreateIfNotExistsAsync();
+                return table;
+            }
+            catch(Exception e)
+            {
+                throw new ApplicationException($"Failed to connect to Azure storage account, please make sure that you have the valid connection string and your ip is whitelisted.");
+            }
         }
 
     }
